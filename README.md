@@ -19,6 +19,8 @@ If you want to contribute to models, be sure to review the [contribution guideli
 [Apache License 2.0](LICENSE)
 
 
-##以下是加注释的地方
+## 以下是加中文注释的地方
+
+models/tutorials/image/cifar10  用来理解卷积神经网络
 
 
