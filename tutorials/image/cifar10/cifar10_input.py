@@ -33,12 +33,13 @@ NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN = 50000
 NUM_EXAMPLES_PER_EPOCH_FOR_EVAL = 10000
 
 
-def _get_images_labels(batch_size, split, distords=False):
+def _get_images_labels(batch_size, split, distords=False): 
   """Returns Dataset for given split."""
-  dataset = tfds.load(name='cifar10', split=split)
-  scope = 'data_augmentation' if distords else 'input'
+  dataset = tfds.load(name='cifar10', split=split)#这种方法是获取内部的自带的数据集也可以用其它的函数读取下载后的数据集  参数split 是获得的数据集
+  scope = 'data_augmentation' if distords else 'input' #如果distord的值为False则scope的值为'data_augmentation'
   with tf.name_scope(scope):
-    dataset = dataset.map(DataPreprocessor(distords), num_parallel_calls=10)
+    dataset = dataset.map(DataPreprocessor(distords), num_parallel_calls=10)#该函数用法 参见https://www.cnblogs.com/hellcat/p/8569651.html
+    #num_parallel_calls是用来加速的 可以并行读取 DataPreprocessor定义见下方
   # Dataset is small enough to be fully loaded on memory:
   dataset = dataset.prefetch(-1)
   dataset = dataset.repeat().batch(batch_size)
