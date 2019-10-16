@@ -39,7 +39,9 @@ def _get_images_labels(batch_size, split, distords=False):
   scope = 'data_augmentation' if distords else 'input' #如果distord的值为False则scope的值为'data_augmentation'
   with tf.name_scope(scope):
     dataset = dataset.map(DataPreprocessor(distords), num_parallel_calls=10)#该函数用法 参见https://www.cnblogs.com/hellcat/p/8569651.html
-    #num_parallel_calls是用来加速的 可以并行读取 DataPreprocessor定义见下方
+    #num_parallel_calls是用来加速的 可以并行读取 DataPreprocessor定义见下方 对于该函数应用的解释：DataPreprocessor（）是个类，若实际应用时 写成
+    #DataPreprocessor（a）则参数a实际传到函数__init__ 而类函数和tensorflow中的map函数结合起来 实际是将原dataset中的数据集当作类DataPreprocessor
+    #的调用函数 __call__的输入
   # Dataset is small enough to be fully loaded on memory:
   dataset = dataset.prefetch(-1)
   dataset = dataset.repeat().batch(batch_size)
@@ -58,7 +60,7 @@ class DataPreprocessor(object):
 
   def __call__(self, record):
     """Process img for training or eval."""
-    img = record['image']
+    img = record['image']#这里 在调用时record是原数据集dataset的数据集
     img = tf.cast(img, tf.float32)
     if self._distords:  # training
       # Randomly crop a [height, width] section of the image.
