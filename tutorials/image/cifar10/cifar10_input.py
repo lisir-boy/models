@@ -52,7 +52,7 @@ def _get_images_labels(batch_size, split, distords=False):
   return images, labels
 
 
-class DataPreprocessor(object):
+class DataPreprocessor(object):#该类返回处理后的数据包含input 及target两类数据
   """Applies transformations to dataset record."""
 
   def __init__(self, distords):
@@ -60,25 +60,25 @@ class DataPreprocessor(object):
 
   def __call__(self, record):
     """Process img for training or eval."""
-    img = record['image']#这里 在调用时record是原数据集dataset的数据集
-    img = tf.cast(img, tf.float32)
+    img = record['image']#这里 在调用时record是原数据集dataset的数据集 在tensorflow自带的数据集cifar10中有两个标签image及 label
+    img = tf.cast(img, tf.float32)#该函数功能是进行数据格式转变  此处是转为float32格式
     if self._distords:  # training
-      # Randomly crop a [height, width] section of the image.
+      # Randomly crop a [height, width] section of the image.随机裁剪指定大小的图片
       img = tf.random_crop(img, [IMAGE_SIZE, IMAGE_SIZE, 3])
-      # Randomly flip the image horizontally.
+      # Randomly flip the image horizontally.随机水平翻转图像
       img = tf.image.random_flip_left_right(img)
       # Because these operations are not commutative, consider randomizing
-      # the order their operation.
+      # the order their operation.因为这些操作不是可交换的，所以可以考虑将它们的操作顺序随机化。
       # NOTE: since per_image_standardization zeros the mean and makes
       # the stddev unit, this likely has no effect see tensorflow#1458.
-      img = tf.image.random_brightness(img, max_delta=63)
-      img = tf.image.random_contrast(img, lower=0.2, upper=1.8)
+      img = tf.image.random_brightness(img, max_delta=63)#随机变换图像的亮度
+      img = tf.image.random_contrast(img, lower=0.2, upper=1.8)#随机变换图像的对比度
     else:  # Image processing for evaluation.
       # Crop the central [height, width] of the image.
-      img = tf.image.resize_image_with_crop_or_pad(img, IMAGE_SIZE, IMAGE_SIZE)
-    # Subtract off the mean and divide by the variance of the pixels.
+      img = tf.image.resize_image_with_crop_or_pad(img, IMAGE_SIZE, IMAGE_SIZE)#中心位置剪裁
+    # Subtract off the mean and divide by the variance of the pixels.减去平均值，然后除以像素的方差
     img = tf.image.per_image_standardization(img)
-    return dict(input=img, target=record['label'])
+    return dict(input=img, target=record['label'])#返回处理后的数据包含input 及target两类数据
 
 
 def distorted_inputs(batch_size):
